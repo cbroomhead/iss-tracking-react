@@ -44,8 +44,7 @@ Number.prototype.toRadians = function() {
 
 
 
-app.post('/location', function(req, res) {
-console.log("ON THE SERVER AFTER THE AXIOS POST");
+app.post('/mylocation', function(req, res) {
     var city = req.body;
     var apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?address='+ city.location;
     request(apiUrl, function(err, info){
@@ -53,26 +52,25 @@ console.log("ON THE SERVER AFTER THE AXIOS POST");
             console.log(err);
         }
         else {
-            //console.log(JSON.parse(info.body).results);
-            
             var lat2 = JSON.parse(info.body).results[0].geometry.location.lat;
             var lon2 = JSON.parse(info.body).results[0].geometry.location.lng;
             var ISSurl = 'https://api.wheretheiss.at/v1/satellites/25544';
-            res.send({ msg: 'ok', desc: 'here is the user defined position', lat2: lat2, lon2:lon2});
-            request(ISSurl, function(err, position) {
+            res.send({ msg: 'ok', desc: 'here is the user defined position', mycoor : {lat2: lat2, lon2: lon2}});
+        }
+    })
+});
+
+app.post('/isslocation', function(req, res) {
+            request(req.body.issUrl, function(err, position) {
                 if (err) {
                     console.log('there was an error');
                 }
                 else {
                     var lat1= (JSON.parse(position.body).latitude);
                     var lon1= (JSON.parse(position.body).longitude);
-                    //distanceFormula(lat1, lon1, lat2, lon2, city.location);
-                    //console.log(lat1, lon1, lat2, lon2, city.location);
+                    res.send({ msg: 'ok', desc: 'here is the ISS position', isscoor : {lat1: lat1, lon1: lon1}});
                 }
             });
-           
-        }
-    })
 });
 
 
