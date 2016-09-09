@@ -21442,14 +21442,21 @@
 	
 	    getInitialState: function getInitialState() {
 	        return {
-	            distance: 0
+	            distance: '?',
+	            location: '?'
 	        };
 	    },
 	    _handleClick: function _handleClick(event) {
-	        event.preventDefault();
+	        event.preventDefault(event);
+	        this.setState({ location: this.refs.userInput.value });
+	        var self = this;
+	        setInterval(function () {
+	            self._getData();
+	        }, 1000);
+	    },
+	    _getData: function _getData() {
 	        var that = this;
 	        axios.all([that._getMyLocation(), that._getIssLocation()]).then(axios.spread(function (my, iss) {
-	            console.log(that.state);
 	            var lat1 = that.state.lat1;
 	            var lon1 = that.state.lon1;
 	            var lat2 = that.state.lat2;
@@ -21500,7 +21507,6 @@
 	        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	
 	        var d = R * c;
-	        console.log("THIS IS THE RESULT OF THE FORUMA", d);
 	        that.setState({
 	            distance: d
 	        });
@@ -21510,36 +21516,50 @@
 	            'main',
 	            null,
 	            React.createElement(
-	                'h1',
-	                null,
-	                'This is the ISS tracking application'
-	            ),
-	            React.createElement('hr', null),
-	            React.createElement(
 	                'div',
-	                null,
+	                { className: 'row' },
+	                React.createElement('div', { className: 'col-md-2' }),
 	                React.createElement(
-	                    'form',
-	                    { name: 'myform', className: 'input-group' },
-	                    React.createElement('input', { ref: 'userInput', className: 'form-control input-lg', type: 'text', name: 'mytextfield' }),
+	                    'div',
+	                    { className: 'col-md-8' },
 	                    React.createElement(
-	                        'span',
-	                        { className: 'input-group-btn' },
-	                        React.createElement(
-	                            'button',
-	                            { onClick: this._handleClick, className: 'btn btn-lg btn-danger' },
-	                            'Submit'
-	                        )
+	                        'h1',
+	                        null,
+	                        'Track the ISS from your city!'
 	                    ),
 	                    React.createElement(
 	                        'div',
 	                        null,
 	                        React.createElement(
-	                            'p',
+	                            'form',
+	                            { name: 'myform' },
+	                            React.createElement(
+	                                'div',
+	                                { className: 'form-group' },
+	                                React.createElement(
+	                                    'label',
+	                                    { 'for': 'citySubmit' },
+	                                    'Enter the city where you are right now'
+	                                ),
+	                                React.createElement('input', { className: 'form-control', ref: 'userInput', type: 'text', name: 'mytextfield' }),
+	                                React.createElement(
+	                                    'button',
+	                                    { onClick: this._handleClick, type: 'submit', className: 'btn btn-primary' },
+	                                    'Submit'
+	                                )
+	                            )
+	                        ),
+	                        React.createElement(
+	                            'div',
 	                            null,
-	                            ' The ISS is ',
-	                            this.state.distance,
-	                            ' meters away'
+	                            React.createElement(
+	                                'p',
+	                                null,
+	                                ' The ISS is ',
+	                                this.state.distance,
+	                                ' meters away from ',
+	                                this.state.location
+	                            )
 	                        )
 	                    )
 	                )

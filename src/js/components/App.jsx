@@ -4,15 +4,22 @@ var axios = require("axios");
 var App = React.createClass({
     getInitialState: function (){
       return {
-          distance : 0
+          distance : '?',
+          location : '?'
       };  
     },
     _handleClick: function (event){
-        event.preventDefault();
+        event.preventDefault(event);
+       this.setState({location : this.refs.userInput.value});
+        var self = this;
+        setInterval(function() {
+            self._getData();
+        }, 1000);
+    },
+    _getData: function (){
         var that = this;
         axios.all([that._getMyLocation(), that._getIssLocation()])
         .then(axios.spread(function (my, iss) {
-            console.log(that.state);
             var lat1 = that.state.lat1;
             var lon1 = that.state.lon1;
             var lat2 = that.state.lat2;
@@ -70,7 +77,6 @@ var App = React.createClass({
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     
         var d = R * c;
-    console.log("THIS IS THE RESULT OF THE FORUMA", d)
     that.setState({
                 distance : d
             })
@@ -78,22 +84,24 @@ var App = React.createClass({
     render: function() {
         return (
           <main>
-            <h1>This is the ISS tracking application</h1>
-            <hr/>
-                <div>
-                    <form name="myform" className="input-group"> 
-                        <input ref="userInput" className="form-control input-lg" type="text" name="mytextfield" />
-                            <span className="input-group-btn">
-                                <button onClick={this._handleClick} className="btn btn-lg btn-danger">  
-                                    Submit
-                                </button>
-                            </span>
+          <div className="row">
+            <div className="col-md-2"></div>
+                <div className="col-md-8">
+                    <h1>Track the ISS from your city!</h1>
+                        <div>
+                            <form name="myform"> 
+                                <div className="form-group">
+                                    <label for="citySubmit">Enter the city where you are right now</label>
+                                        <input className="form-control" ref="userInput" type="text" name="mytextfield" />
+                                            <button onClick={this._handleClick} type="submit" className="btn btn-primary">Submit</button>
+                                </div>    
+                            </form>
                             <div>
-                            <p> The ISS is {this.state.distance} meters away</p>
+                                <p> The ISS is {this.state.distance} meters away from {this.state.location}</p>
                             </div>
-                            
-                    </form>
-                </div>
+                        </div>
+              </div>
+          </div>
           </main>
         );
     }
